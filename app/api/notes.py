@@ -8,6 +8,9 @@ from sqlalchemy.orm import Session
 
 router = APIRouter()
 
+# This is attaching metadata to the Session type
+# FastAPI is looking for specific annotations, e.g. Depends
+# when it finds that it knows the is a dependency and will inject it
 DBSession = Annotated[Session, Depends(get_db)]
 
 
