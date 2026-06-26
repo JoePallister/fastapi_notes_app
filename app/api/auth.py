@@ -1,0 +1,32 @@
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
+from typing_extensions import Annotated
+from app.auth.deps import get_current_user
+from app.db.deps import get_db
+from app.services.auth_service import create_user
+
+router = APIRouter()
+
+DBSession = Annotated[Session, Depends(get_db)]
+
+CurrentUser = Annotated[
+    str,
+    Depends(get_current_user),
+]
+
+
+@router.post("/register")
+def register(db: DBSession, username: str, password: str):
+    user = create_user(db, username=username, password=password)
+    return {"username": user.username}
+
+
+@router.post("/login")
+def login(db: DBSession, username: str, password: str):
+    # Implementation for login logic
+    pass
+
+
+@router.get("/me")
+def me(user: CurrentUser):
+    return {"username": user}
