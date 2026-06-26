@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing_extensions import Annotated
 from app.auth.deps import get_current_user
 from app.db.deps import get_db
-from app.services.auth_service import create_user
+from app.services.auth_service import create_user, login_user
 
 router = APIRouter()
 
@@ -23,8 +23,8 @@ def register(db: DBSession, username: str, password: str):
 
 @router.post("/login")
 def login(db: DBSession, username: str, password: str):
-    # Implementation for login logic
-    pass
+    user = login_user(db, username=username, password=password)
+    return {"username": user.username}
 
 
 @router.get("/me")
