@@ -13,6 +13,8 @@ router = APIRouter()
 # when it finds that it knows the is a dependency and will inject it
 DBSession = Annotated[Session, Depends(get_db)]
 
+NOT_FOUND_RESPONSE = {404: {"description": "Resource not found"}}
+
 
 @router.post("/", response_model=NoteOut)
 def create(note: NoteCreate, db: DBSession):
@@ -24,7 +26,7 @@ def list_notes(db: DBSession):
     return get_notes(db)
 
 
-@router.get("/{note_id}", response_model=NoteOut)
+@router.get("/{note_id}", response_model=NoteOut, responses=NOT_FOUND_RESPONSE)
 def read(note_id: int, db: DBSession):
     note = get_note(db, note_id)
     if not note:
@@ -32,7 +34,7 @@ def read(note_id: int, db: DBSession):
     return note
 
 
-@router.delete("/{note_id}")
+@router.delete("/{note_id}", responses=NOT_FOUND_RESPONSE)
 def remove(note_id: int, db: DBSession):
     deleted = delete_note(db, note_id)
     if not deleted:
