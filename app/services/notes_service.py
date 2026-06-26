@@ -1,27 +1,29 @@
-from app.db.memory import notes, next_id
+from sqlalchemy.orm import Session
+from app.schemas.note import NoteCreate
+from app.models.note import Note
 
 
-def create_note(note):
-    global next_id
-
-    new_note = {"id": next_id, "title": note.title, "content": note.content}
-
-    notes.append(new_note)
-    next_id += 1
-    return new_note
+def create_note(db: Session, note: NoteCreate):
+    db_note = Note(title=note.title, content=note.content)
+    db.add(db_note)
+    db.commit()
+    db.refresh(db_note)
+    return db_note
 
 
-def get_notes():
-    return notes
+def get_notes(db: Session):
+    return db.query(Note).all()
 
 
-def get_note(note_id: int):
-    return next((n for n in notes if n["id"] == note_id), None)
+def get_note(db: Session, note_id: int):
+    return db.query(Note).filter(Note.id == note_id).first()
 
 
-def delete_note(note_id: int):
-    for i, n in enumerate(notes):
-        if n["id"] == note_id:
-            del notes[i]
-            return True
-    return False
+def delete_note(db: Session, note_id: int):
+    note = db.query(Note).filter(Note.id == note_id).first()
+    if not note:
+        return False
+
+    db.delete(note)
+    db.commit()
+    return True

@@ -1,6 +1,9 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from app.api import notes
+from app.db.database import Base, engine
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
