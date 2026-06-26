@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from typing_extensions import Annotated
 from app.auth.deps import get_current_user
+from app.auth.passwords import create_token
 from app.db.deps import get_db
 from app.services.auth_service import create_user, login_user
 
@@ -24,7 +25,7 @@ def register(db: DBSession, username: str, password: str):
 @router.post("/login")
 def login(db: DBSession, username: str, password: str):
     user = login_user(db, username=username, password=password)
-    return {"username": user.username}
+    return {"access_token": create_token(user.id), "token_type": "bearer"}
 
 
 @router.get("/me")
