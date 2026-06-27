@@ -5,6 +5,7 @@ from app.auth.deps import get_current_user
 from app.auth.passwords import create_token
 from app.db.deps import get_db
 from app.services.auth_service import create_user, login_user
+from app.schemas.auth import LoginRequest
 
 router = APIRouter()
 
@@ -23,8 +24,8 @@ def register(db: DBSession, username: str, password: str):
 
 
 @router.post("/login")
-def login(db: DBSession, username: str, password: str):
-    user = login_user(db, username=username, password=password)
+def login(db: DBSession, data: LoginRequest):
+    user = login_user(db, username=data.username, password=data.password)
     return {"access_token": create_token(user.id), "token_type": "bearer"}
 
 
