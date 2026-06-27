@@ -1,52 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>FastAPI Notes</title>
-    <style>
-        body { font-family: Arial; max-width: 600px; margin: 40px auto; }
-        input, textarea { width: 100%; margin: 5px 0; padding: 6px; }
-        button { padding: 8px; margin-top: 5px; cursor: pointer; }
-        .note { border: 1px solid #ddd; padding: 10px; margin-top: 10px; }
-        #auth-status { margin-top: 10px; font-weight: bold; }
-        .section { margin-bottom: 25px; }
-    </style>
+    <title>Login</title>
 </head>
 <body>
 
-<h1>Notes App</h1>
+<h2>Login</h2>
 
-<!-- AUTH -->
-<div class="section">
-    <h3>Login</h3>
+<input id="username" placeholder="Username">
+<input id="password" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
 
-    <input id="username" placeholder="Username">
-    <input id="password" type="password" placeholder="Password">
-    <button onclick="login()">Login</button>
-
-    <div id="auth-status">Not logged in</div>
-</div>
-
-<!-- CREATE NOTE -->
-<div class="section">
-    <h3>Create Note</h3>
-
-    <input id="title" placeholder="Title">
-    <textarea id="content" placeholder="Content"></textarea>
-    <button onclick="createNote()">Create</button>
-</div>
-
-<!-- NOTES -->
-<div class="section">
-    <h3>Notes</h3>
-    <div id="notes"></div>
-</div>
+<p id="status"></p>
 
 <script>
-const API = "/notes/";
-
-let token = null;
-
-// LOGIN
 async function login() {
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
@@ -60,64 +27,18 @@ async function login() {
     });
 
     if (!res.ok) {
-        document.getElementById("auth-status").innerText = "Login failed";
+        document.getElementById("status").innerText = "Login failed";
         return;
     }
 
     const data = await res.json();
-    token = data.access_token;
 
-    document.getElementById("auth-status").innerText =
-        "Logged in as " + username;
+    // store token
+    localStorage.setItem("token", data.access_token);
 
-    loadNotes();
+    // redirect to notes
+    window.location.href = "/static/notes.html";
 }
-
-// LOAD NOTES
-async function loadNotes() {
-    const res = await fetch(API, {
-        headers: token
-            ? { "Authorization": "Bearer " + token }
-            : {}
-    });
-
-    const data = await res.json();
-
-    const container = document.getElementById("notes");
-    container.innerHTML = "";
-
-    data.forEach(note => {
-        container.innerHTML += `
-            <div class="note">
-                <b>${note.title}</b>
-                <p>${note.content}</p>
-            </div>
-        `;
-    });
-}
-
-// CREATE NOTE
-async function createNote() {
-    const title = document.getElementById("title").value;
-    const content = document.getElementById("content").value;
-
-    await fetch(API, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            ...(token ? { "Authorization": "Bearer " + token } : {})
-        },
-        body: JSON.stringify({ title, content })
-    });
-
-    document.getElementById("title").value = "";
-    document.getElementById("content").value = "";
-
-    loadNotes();
-}
-
-// INITIAL LOAD
-loadNotes();
 </script>
 
 </body>

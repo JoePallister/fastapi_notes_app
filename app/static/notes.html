@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Notes</title>
+    <style>
+        body { font-family: Arial; max-width: 600px; margin: 40px auto; }
+        input, textarea { width: 100%; margin: 5px 0; }
+        button { padding: 8px; }
+        .note { border: 1px solid #ddd; padding: 10px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<h1>Your Notes</h1>
+
+<button onclick="logout()">Logout</button>
+
+<h3>Create Note</h3>
+
+<input id="title" placeholder="Title">
+<textarea id="content" placeholder="Content"></textarea>
+<button onclick="createNote()">Create</button>
+
+<h3>Notes</h3>
+<div id="notes"></div>
+
+<script>
+const API = "/notes/";
+const token = localStorage.getItem("token");
+
+// if no token → back to login
+if (!token) {
+    window.location.href = "/static/index.html";
+}
+
+function authHeaders() {
+    return {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
+    };
+}
+
+async function loadNotes() {
+    const res = await fetch(API, {
+        headers: {
+            "Authorization": "Bearer " + token
+        }
+    });
+
+    const data = await res.json();
+
+    const container = document.getElementById("notes");
+    container.innerHTML = "";
+
+    data.forEach(note => {
+        container.innerHTML += `
+            <div class="note">
+                <b>${note.title}</b>
+                <p>${note.content}</p>
+            </div>
+        `;
+    });
+}
+
+async function createNote() {
+    const title = document.getElementById("title").value;
+    const content = document.getElementById("content").value;
+
+    await fetch(API, {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify({ title, content })
+    });
+
+    document.getElementById("title").value = "";
+    document.getElementById("content").value = "";
+
+    loadNotes();
+}
+
+function logout() {
+    localStorage.removeItem("token");
+    window.location.href = "/static/index.html";
+}
+
+loadNotes();
+</script>
+
+</body>
+</html>

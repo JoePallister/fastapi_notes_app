@@ -9,4 +9,4 @@ app = FastAPI()
 
 app.include_router(notes.router, prefix="/notes", tags=["notes"])
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
-app.mount("/", StaticFiles(directory="app/static", html=True), name="static")
+app.mount("/static", StaticFiles(directory="app/static", html=True), name="static")
