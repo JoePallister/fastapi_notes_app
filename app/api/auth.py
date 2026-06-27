@@ -18,8 +18,8 @@ CurrentUser = Annotated[
 
 
 @router.post("/register")
-def register(db: DBSession, username: str, password: str):
-    user = create_user(db, username=username, password=password)
+def register(db: DBSession, data: LoginRequest):
+    user = create_user(db, username=data.username, password=data.password)
     return {"username": user.username}
 
 

@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <script>
+    if (!localStorage.getItem("token")) {
+        window.location.replace("/static/index.html");
+    }
+    </script>
     <title>Notes</title>
     <style>
         body { font-family: Arial; max-width: 600px; margin: 40px auto; }

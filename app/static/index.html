@@ -1,22 +1,73 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Login</title>
+    <title>FastAPI Notes - Login</title>
+    <style>
+        body { font-family: Arial; max-width: 500px; margin: 40px auto; }
+        input { width: 100%; margin: 5px 0; padding: 8px; }
+        button { padding: 8px; margin-top: 5px; width: 100%; }
+        .box { border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; }
+        h2 { margin-top: 0; }
+        p { color: #555; }
+    </style>
 </head>
 <body>
 
-<h2>Login</h2>
+<h1>Notes App</h1>
 
-<input id="username" placeholder="Username">
-<input id="password" type="password" placeholder="Password">
-<button onclick="login()">Login</button>
+<!-- REGISTER -->
+<div class="box">
+    <h2>Register</h2>
 
-<p id="status"></p>
+    <input id="reg-username" placeholder="Username">
+    <input id="reg-password" type="password" placeholder="Password">
+    <button onclick="register()">Register</button>
+
+    <p id="reg-status"></p>
+</div>
+
+<!-- LOGIN -->
+<div class="box">
+    <h2>Login</h2>
+
+    <input id="login-username" placeholder="Username">
+    <input id="login-password" type="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+
+    <p id="login-status"></p>
+</div>
 
 <script>
+let token = null;
+
+/* ---------------- REGISTER ---------------- */
+async function register() {
+    const username = document.getElementById("reg-username").value;
+    const password = document.getElementById("reg-password").value;
+
+    const res = await fetch("/auth/register", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ username, password })
+    });
+
+    if (!res.ok) {
+        document.getElementById("reg-status").innerText = "Registration failed";
+        return;
+    }
+
+    const data = await res.json();
+
+    document.getElementById("reg-status").innerText =
+        "User created: " + data.username;
+}
+
+/* ---------------- LOGIN ---------------- */
 async function login() {
-    const username = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
+    const username = document.getElementById("login-username").value;
+    const password = document.getElementById("login-password").value;
 
     const res = await fetch("/auth/login", {
         method: "POST",
@@ -27,16 +78,18 @@ async function login() {
     });
 
     if (!res.ok) {
-        document.getElementById("status").innerText = "Login failed";
+        document.getElementById("login-status").innerText = "Login failed";
         return;
     }
 
     const data = await res.json();
 
-    // store token
-    localStorage.setItem("token", data.access_token);
+    token = data.access_token;
+    localStorage.setItem("token", token);
 
-    // redirect to notes
+    document.getElementById("login-status").innerText =
+        "Login successful! Redirecting...";
+
     window.location.href = "/static/notes.html";
 }
 </script>
