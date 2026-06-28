@@ -19,6 +19,9 @@ users = []
 Credentials = Annotated[HTTPAuthorizationCredentials, Depends(bearer_scheme)]
 
 
+# bearer_scheme is pulling out the token from the request, so
+# credentials=bearer_scheme(request) and token=credentials.credentials
+# FastAPI is dealing with handing request to bearer_scheme
 def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
     db: Session = Depends(get_db),
